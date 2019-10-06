@@ -1,3 +1,4 @@
+// then 方法未实现
 const Promise  = require('./index.js')
 console.log(1)
 new Promise((resolve, reject) => {
