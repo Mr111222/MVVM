@@ -1,0 +1,11 @@
+{
+    "configurations": [
+      node
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "launch program normally",
+      "program": "${workspaceFolder}\\index.js"
+    }
+  ]
+}

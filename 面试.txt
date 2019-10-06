@@ -1,0 +1,190 @@
+
+
+1.事件模型 捕获，冒泡
+	事件流:事件通过捕获到达目标元素，目标元素通过冒泡上传到window对象
+2.捕获过程
+	window>document>html>body>element  冒泡与之相反
+	document.body 来获取body元素
+	document.documentElemen 获取document元素
+3.event.currentTarget :通过事件委托来找到委托的父级元素
+ 	event.target :为事件委托下的点击当前的子元素
+4.自定义事件
+	定义：
+	var eve = new Event('事件名称')
+	document.getElementById("box").addEventListener('事件名称',function(){}, false)
+
+	setTimeout(()=>{
+		document.getElementById("box").dispatchEvent(eve)
+	},1000)
+
+	event 自定义事件不足是不能传递参数
+	CuntomEvent() 可以添加自定义参数
+
+
+5.原型链
+构造函数的instaceof 是否是他的实例
+实例的__proto__ 等于 实例的constructor的prototype
+实例的constructor 等于 他的构造函数
+构造函数的prototype 等于他的原型
+
+6.new运算符的原理或者都干了什么
+	a.创建空对象，并且关联构造函数的原型对象
+	b.执行构造函数
+	c.通过判断构造函数的运行结果是否是构造函数
+var new = function(fun){
+	var o = Object.create(fun.prototype)
+	var k = o.call(this) // 改变this的指向
+	if(typeof k === 'object') {
+		return k
+	}else{
+		return o
+	}
+}
+
+
+7.继承方式
+	function Fu(name){
+		this.name = 'name'
+	}
+
+	function Zi(){
+		this.type = 'type'
+	}
+	// 构造函数继承
+		function Zi(){
+			Fu.call(this)
+		}
+	// 原型链继承
+		Zi.prototype = new Fu()
+	// 组合式继承 (构造函数继承+原型链继承)
+		function Zi(){
+			Fu.call(this)
+		}
+		Zi.prototype = new Fu()
+	1.构造函数继承 ---->   Fu.call(this)
+		缺点:不能继承原型链上面的属性方法
+	2.原型链继承 ----> Zi.prototype = new Fu()
+		缺点:当创建多个实例的时候，修改某个值，其他的实例都会修改，原因:多个实例公用同一个原型对象
+	3.组合是继承 
+		Zi.prototype = Object.creat(Fu.prototype)
+		Zi.prototype.constructor = Zi
+		缺点:会多次执行父级构造函数, 无法判断实例是否是自己创建还是父级创建
+8.跨域方式
+	jsonp  script标签的异步加载 通过callback后面拼接个函数名称，并在自己的脚本创建这个callback函数
+	hash
+	postMessage
+	WebSocket
+	cors Fetch 需要加一定的配置 回家请求头中添加origin
+
+
+	Hash方法获取到iframe数据
+	当前页面
+		var iframe = document.getElementByTagName('iframe')
+		iframe.src = iframe.src+'#'+ 'data'
+		
+	其他页面
+		window.onhashchange = function (){
+			var data = window.location.hash
+		}
+	postMessage
+
+
+	cors  fench  参考链接 cors阮一峰
+9. 什么是DOCTYPE及作用
+		声明文档类型，并且告诉浏览器通过什么内核来解析
+		HTML4.0 包括严谨模式和宽松模式 主要是对废弃标签的解析问题
+
+10 什么是EventLoop
+	执行栈首先执行同步任务，当遇到异步任务首先挂起，执行同步任务栈里面的任务，此时并不会直接把异步任务添加到异步队列里面，但当同步任务栈发现没有同步任务可执行才会调用异步队列的任务，此时改异步操作的时间到了才会添加到异步队列，如此反复的执行
+
+	异步任务：定时器，dom事件，promise
+
+
+	Vue
+	1.自定义组件的语法糖 v-model 是怎样实现的
+		v-model本质上就是语法糖，即利用v-model绑定数据后，其实就是既绑定了数据，又添加了一个input事件监听
+	2.实现双向数据绑定
+		AngularJS的双向绑定基于脏检测(dirty checking)。所谓的dirty checking就是对比新旧两个值，如果有变化（形象点说，就是这个值脏了），就更新。AngularJS注册了以下几个事件，当这些事件发生后，就会开始”脏检测”。”脏检测”的核心函数是$digest()。
+		DOM事件(Click, Keyup)
+		XHR响应
+		浏览器Location变化
+		Timer事件(setTimeout()和setInterval())
+		手动执行 $digest() 或$apply()
+	3. vue双向数据绑定
+		Object.defineProperty() 来劫持各个属性的 setter / getter，在数据变动时发布消息给订阅者，触发相应的监听回调，
+		const inp = document.getElementById('inps')
+		const ps = document.getElementById('ps')
+		const obj = {}
+		Object.defineProperty(obj,'value', {
+			get(val){
+				return obj.value
+			},
+			set(val){
+				ps.innerHTML = val
+			}
+		})
+
+
+		inp.addEventListener('input', function(e){
+			obj.value = e.target.value
+		},false)
+	4. 什么是 MVVM，与 MVC 有什么区别
+		c为control 此时数据的通信是单向的，
+		MVC  M，model数据层，view UI展示层，View 传送指令到 Controller 完成业务逻辑后，要求 Model 改变状态，Model 将新的数据发送到 View，用户得到反馈
+		MVVM  各部分之间的通信，都是双向的。通过modelView作为中间层（即vm的实例），进行双向数据的绑定与变化，View 与 Model 不发生联系 ，
+
+	5.nextTick()
+		在下次 DOM 更新循环结束之后执行延迟回调。在修改数据之后，立即使用这个回调函数，获取更新后的 DOM。
+	6.Vue原理
+		通过建立虚拟dom树document.createDocumentFragment(),方法创建虚拟dom树。
+		一旦被监测的数据改变，会通过Object.defineProperty定义的数据拦截，截取到数据的变化。
+		截取到的数据变化，从而通过订阅——发布者模式，触发Watcher（观察者）,从而改变虚拟dom的中的具体数据。
+		最后，通过更新虚拟dom的元素值，从而改变最后渲染dom树的值，完成双向绑定
+
+	7.
+	全局的路由钩子函数：beforeEach、afterEach
+
+	单个的路由钩子函数：beforeEnter
+
+	组件内的路由钩子函数：beforeRouteEnter、beforeRouteLeave、beforeRouteUpdate
+	8. 如何给vue自定义组件添加点击事件？ @click.native='fns'
+	9.keep-alive有关的生命周期
+		activated和deactivated
+		1.activated： 页面第一次进入的时候，钩子触发的顺序是created->mounted->activated
+		2.deactivated: 页面退出的时候会触发deactivated，当再次前进或者后退的时候只触发activated
+	10 Vue生命周期
+		beforeCreate data和el都为undefined
+		create data初始化完成，el为undifined，不能访问$el,$ref为空数组
+		beforeMounted 有了el,编译template模板内容
+		mounted 完成vm实例可以访问变量
+		beforUpdata
+		Updata
+		beforeDestroyed
+		destroyed
+		总结:一个完整的生命周期，也就是从开始创建、初始化数据、编译模版、挂载Dom -> 渲染、更新 -> 渲染、卸载等一系列过程，我们称这是Vue的生命周期。
+
+		创建前/后, 载入前/后,更新前/后,销毁前/销毁后。
+
+		创建前/后(1.beforeCreate, 2.created),
+		载入前/后(3.beforeMount, 4.mounted),
+		更新前/后(5.beforeUpdate, 6.updated),
+		销毁前/后(7.beforeDestroy,8.destroyed),
+		激活时/未激活时(9.activated, 10.deactivated)，
+
+	11.说说你对el,template,render的理解
+		el: 把当前实例挂载在元素上
+		template: 实例模版, 可以是.vue中的template, 也可以是template选项, 最终会编译成render函数
+		render: 不需要通过编译的可执行函数
+	12 computed 和 watch的区别
+		1.当我们要进行数值计算,而且依赖于其他数据，那么把这个数据设计为computed
+		2.如果你需要在某个数据变化时做一些事情，使用watch来观察这个数据变化
+	13 Vue 路由中 route 和router 的区别
+		route是“路由信息对象”，包括path，params，hash，query，fullPath，matched，name等路由信息参数。router是“路由实例”对象包括了路由的跳转方法，钩子函数等。
+
+	14 什么是闭包？闭包的用处？
+
+（1）闭包就是能够读取其他函数内部变量的函数。在本质上，闭包就
+
+是将函数内部和函数外部连接起来的一座桥梁。
+
+（2）闭包可以用在许多地方。它的最大用处有两个，一个是可以读取函数内部的变量，另一个就是让这些变量的值始终保持在内存中
